@@ -1,0 +1,88 @@
+COMP 2406 2024F Assignment 2.txt
+Name: Gana Said
+Student ID:101329317
+
+1. Yes, the db.execute() call is necessary to make sure the people table is created if it doesn’t already exist in the people.db database file.
+ Without this line the database wouldn’t have the table to store records
+  which would cause errors when trying to add data.
+
+  Verification: i tested this by deleting the people.db file and db.execute() and running the program again 
+  the table was not recreated when i restarted the server
+   which showed that db.execute() is what initializes the table if it’s missing.
+
+
+2. yes there is a pattern.
+ all the page titles start with "COMP 2406 DB Demo 2" followed by a specific title that describes each page
+  this pattern is managed by the template_header() function which combines appTitle with a custom page title.
+
+Verification: i changed the appTitle variable on line 11 to(//const appTitle ="Jana is the best DB Demo";) and checked each page
+ the prefix updated on all pages confirming that this variable centrally controls the title format.
+
+
+3. The /add route is where the server handles adding new records. 
+It’s used to process form data that’s sent when you submit the form so it only works when data is sent to it.
+while /add.html is just a regular HTML page that shows the form where you enter the information.
+ you go to this page to fill out the form but it doesn’t actually handle any data by itself
+Verfiction: i  tested both by going to /add directly and it gave me an error because it expected data and then to /add.html which opened the form normally.
+
+4. Removing the ac.abort() line could prevent the server from stopping when i click (Ctrl+C) This line listens for the SIGINT signal (triggered by Ctrl+C) and shuts down the server
+ without it the server ignores the interrupt signal and keeps running.
+
+
+Verification: i removed the ac.abort() line and started the server and pressed Ctrl+C. The server didn’t stop as it usually dose so i had to force it to quit
+ this showed me that ac.abort() is what allows the server to respond to the interrupt signal.
+
+5. Yes, /list only shows up to 50 records because of the LIMIT 50 in the SQL query inside getAllRecordsDB() on line 47
+  means it’ll show the first 50 records alphabetically by name.
+
+
+Verification: i tested this by adding over 50 records to the database and accessing /list.
+ only 50 records were showed confirming that the LIMIT 50 restriction was applied
+
+
+6a. i used JavaScript (.sort()) method in the showAnalysis() function.
+ after retrieving the city data i applied //.sort((a, b) => a.localeCompare(b)) to sort the list alphabetically
+ i found explaning for it in here https://www.freecodecamp.org/news/how-to-sort-alphabetically-in-javascript/
+to tested i added analysis.cityList = analysis.cityList.sort((a, b) => a[0].localeCompare(b[0])); to the showAnalysis() function and checked /analyze to ensure the cities were sorted alphabetically.
+
+i updated showAnalysis() to this line :
+//analysis.cityList = analysis.cityList.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+{ sensitivity: 'base' } allows the sorting to ignore cases.
+i found this info in here https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
+
+
+6b. To sort cities directly in SQL, i modified the query in analyzeRecordsDB():
+//analysis.cityList = db.query("SELECT DISTINCT city FROM " + table + " ORDER BY city COLLATE NOCASE ASC");
+
+after adding COLLATE NOCASE ASC query i accessed /analyze and confirmed that the cities appeared alphabetically on the page without more sorting needed in JavaScript.
+
+
+7a. i put another SQL query in analyzeRecordsDB() to get distinct countries:
+// analysis.countryList = db.query("SELECT DISTINCT country FROM " + table);
+in showAnalysis(), I included countryList in the HTML output and accessed /analyze.
+ The list of countries displayed correctly showing that the query worked.
+ thats what i added:
+ //var countryList = '<li>' + analysis.countryList.join('</li><li>') + '</li>';
+ //<p>Countries:
+      <ol>
+       ${countryList}
+      </ol>
+    </p>
+
+7b. i modified analyzeRecordsDB() to count distinct cities and countries:
+//analysis.cityCount = db.query("SELECT COUNT(DISTINCT city) FROM " + table);
+//analysis.countryCount = db.query("SELECT COUNT(DISTINCT country) FROM " + table);
+
+to tested i updated showAnalysis() to display cityCount and countryCount. Reloading /analyze confirmed that the counts appeared on the page.
+
+
+
+8. i  used JavaScript’s Date object to validate the birthday input. In addRecord(), i added:
+//const date = new Date(obj.birthday);
+if (isNaN(date.getTime())) {
+  throw new Error("Invalid date");
+}
+
+
+ isNaN(date.getTime()) checks if the date is invalid. 
+ i tested by submitting various dates on /add.html confirming that only valid dates were accepted.
